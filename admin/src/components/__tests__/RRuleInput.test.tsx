@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { RRule } from 'rrule';
 
 import type { RRuleValue } from '../../types';
@@ -36,30 +35,20 @@ describe('RRuleInput', () => {
     expect(screen.getByText('Recurrence')).toBeInTheDocument();
   });
 
-  it('renders Configure and Preview tabs', () => {
+  it('renders section header', () => {
     renderWithIntl(
       <RRuleInput name="rrule" label="Recurrence" type="json" />
     );
-    expect(screen.getByRole('tab', { name: /configure/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /preview/i })).toBeInTheDocument();
+    expect(screen.getByText('Recurrence Rule')).toBeInTheDocument();
   });
 
-  it('shows configuration content by default', () => {
+  it('shows both configuration and preview simultaneously', () => {
     renderWithIntl(
       <RRuleInput name="rrule" label="Recurrence" type="json" />
     );
-    // Config tab should be active and show "Frequency" label
+    // Config side: Frequency label
     expect(screen.getByText('Frequency')).toBeInTheDocument();
-  });
-
-  it('switches to preview tab on click', async () => {
-    const user = userEvent.setup();
-    renderWithIntl(
-      <RRuleInput name="rrule" label="Recurrence" type="json" />
-    );
-
-    await user.click(screen.getByRole('tab', { name: /preview/i }));
-    expect(screen.getByText('Description')).toBeInTheDocument();
+    // Preview side: Next occurrences
     expect(screen.getByText('Next occurrences')).toBeInTheDocument();
   });
 

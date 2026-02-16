@@ -13,19 +13,28 @@ interface RulePreviewProps {
 
 const CodeBlock = styled(Box)`
   font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-  font-size: 12px;
-  background-color: ${({ theme }) => theme.colors.neutral100};
-  border: 1px solid ${({ theme }) => theme.colors.neutral200};
+  font-size: 11px;
+  background-color: ${({ theme }) => theme.colors.neutral200};
   border-radius: ${({ theme }) => theme.borderRadius};
-  padding: ${({ theme }) => theme.spaces[3]};
+  padding: ${({ theme }) => theme.spaces[2]};
   overflow-x: auto;
   word-break: break-all;
 `;
 
-const OccurrenceRow = styled(Flex)`
-  &:nth-child(even) {
-    background-color: ${({ theme }) => theme.colors.neutral100};
+const OccurrenceItem = styled(Flex)`
+  padding: ${({ theme }) => `${theme.spaces[1]} ${theme.spaces[2]}`};
+  border-radius: ${({ theme }) => theme.borderRadius};
+
+  &:nth-child(odd) {
+    background-color: ${({ theme }) => theme.colors.neutral0};
   }
+`;
+
+const SummaryBox = styled(Box)`
+  background: ${({ theme }) => theme.colors.primary100};
+  border: 1px solid ${({ theme }) => theme.colors.primary200};
+  border-radius: ${({ theme }) => theme.borderRadius};
+  padding: ${({ theme }) => theme.spaces[3]};
 `;
 
 const SectionLabel = styled(Typography)`
@@ -37,21 +46,16 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
   const { formatMessage, formatDate } = useIntl();
 
   const humanReadable = React.useMemo(() => formatRRuleToHuman(value), [value]);
-  const occurrences = React.useMemo(() => getNextOccurrences(value, 10), [value]);
+  const occurrences = React.useMemo(() => getNextOccurrences(value, 5), [value]);
 
   return (
-    <Flex direction="column" gap={4}>
-      {/* Human-readable description */}
-      <Box>
-        <SectionLabel variant="sigma" textColor="neutral600">
-          {formatMessage({ id: getTrad('preview.description'), defaultMessage: 'Description' })}
-        </SectionLabel>
-        <Box paddingTop={2}>
-          <Typography variant="omega" fontWeight="semiBold">
-            {humanReadable}
-          </Typography>
-        </Box>
-      </Box>
+    <Flex direction="column" gap={3}>
+      {/* Human-readable summary — prominent */}
+      <SummaryBox>
+        <Typography variant="omega" fontWeight="semiBold" textColor="primary700">
+          {humanReadable}
+        </Typography>
+      </SummaryBox>
 
       {/* Timezone */}
       <Box>
@@ -65,7 +69,7 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
         </Box>
       </Box>
 
-      {/* Upcoming occurrences */}
+      {/* Upcoming occurrences — compact list */}
       <Box>
         <SectionLabel variant="sigma" textColor="neutral600">
           {formatMessage({
@@ -73,7 +77,7 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
             defaultMessage: 'Next occurrences',
           })}
         </SectionLabel>
-        <Box paddingTop={2}>
+        <Box paddingTop={1}>
           {occurrences.length === 0 ? (
             <Typography variant="pi" textColor="neutral400">
               {formatMessage({
@@ -82,43 +86,41 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
               })}
             </Typography>
           ) : (
-            occurrences.map((date, index) => (
-              <OccurrenceRow
-                key={index}
-                justifyContent="space-between"
-                alignItems="center"
-                paddingTop={2}
-                paddingBottom={2}
-                paddingLeft={3}
-                paddingRight={3}
-              >
-                <Typography variant="omega">
-                  {formatDate(date, {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    weekday: 'long',
-                  })}
-                </Typography>
-                <Badge size="S">#{index + 1}</Badge>
-              </OccurrenceRow>
-            ))
+            <Flex direction="column" gap={1}>
+              {occurrences.map((date, index) => (
+                <OccurrenceItem
+                  key={index}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="pi">
+                    {formatDate(date, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      weekday: 'short',
+                    })}
+                  </Typography>
+                  <Badge size="S">#{index + 1}</Badge>
+                </OccurrenceItem>
+              ))}
+            </Flex>
           )}
         </Box>
       </Box>
 
-      {/* RRule string */}
+      {/* RRule string — compact */}
       <Box>
         <SectionLabel variant="sigma" textColor="neutral600">
           {formatMessage({
             id: getTrad('preview.rruleString'),
-            defaultMessage: 'RRule string (RFC 5545)',
+            defaultMessage: 'RFC 5545',
           })}
         </SectionLabel>
-        <Box paddingTop={2}>
+        <Box paddingTop={1}>
           <CodeBlock>
-            <Typography variant="omega" textColor="neutral800">
-              RRULE:{value.rruleString || '(empty)'}
+            <Typography variant="pi" textColor="neutral800">
+              {value.rruleString || '(empty)'}
             </Typography>
           </CodeBlock>
         </Box>

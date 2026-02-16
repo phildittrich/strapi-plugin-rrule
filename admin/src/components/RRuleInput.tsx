@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Field, Flex, Tabs, Box } from '@strapi/design-system';
+import { Field, Flex, Box, Typography } from '@strapi/design-system';
 import { type InputProps, useField } from '@strapi/strapi/admin';
 import { useIntl } from 'react-intl';
 import { styled } from 'styled-components';
@@ -20,6 +20,36 @@ const InputContainer = styled(Box)`
   border-radius: ${({ theme }) => theme.borderRadius};
   background: ${({ theme }) => theme.colors.neutral0};
   overflow: hidden;
+`;
+
+const TwoColumnGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ConfigColumn = styled(Box)`
+  padding: ${({ theme }) => theme.spaces[4]};
+`;
+
+const PreviewColumn = styled(Box)`
+  padding: ${({ theme }) => theme.spaces[4]};
+  background: ${({ theme }) => theme.colors.neutral100};
+  border-left: 1px solid ${({ theme }) => theme.colors.neutral200};
+
+  @media (max-width: 768px) {
+    border-left: none;
+    border-top: 1px solid ${({ theme }) => theme.colors.neutral200};
+  }
+`;
+
+const SectionHeader = styled(Box)`
+  padding: ${({ theme }) => `${theme.spaces[3]} ${theme.spaces[4]}`};
+  background: ${({ theme }) => theme.colors.neutral100};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.neutral200};
 `;
 
 export const RRuleInput = React.forwardRef<HTMLDivElement, RRuleInputProps>(
@@ -63,44 +93,28 @@ export const RRuleInput = React.forwardRef<HTMLDivElement, RRuleInputProps>(
           <Field.Label action={labelAction}>{label}</Field.Label>
 
           <InputContainer>
-            <Tabs.Root defaultValue="config">
-              <Box
-                paddingLeft={3}
-                paddingRight={3}
-                background="neutral100"
-                borderColor="neutral200"
-                style={{ borderBottom: '1px solid' }}
-              >
-                <Tabs.List>
-                  <Tabs.Trigger value="config">
-                    {formatMessage({
-                      id: getTrad('tab.config'),
-                      defaultMessage: 'Configure',
-                    })}
-                  </Tabs.Trigger>
-                  <Tabs.Trigger value="preview">
-                    {formatMessage({
-                      id: getTrad('tab.preview'),
-                      defaultMessage: 'Preview',
-                    })}
-                  </Tabs.Trigger>
-                </Tabs.List>
-              </Box>
+            <SectionHeader>
+              <Typography variant="sigma" textColor="neutral600">
+                {formatMessage({
+                  id: getTrad('header.title'),
+                  defaultMessage: 'Recurrence Rule',
+                })}
+              </Typography>
+            </SectionHeader>
 
-              <Box padding={3}>
-                <Tabs.Content value="config">
-                  <RuleConfigSection
-                    value={value}
-                    onChange={handleChange}
-                    disabled={disabled}
-                  />
-                </Tabs.Content>
+            <TwoColumnGrid>
+              <ConfigColumn>
+                <RuleConfigSection
+                  value={value}
+                  onChange={handleChange}
+                  disabled={disabled}
+                />
+              </ConfigColumn>
 
-                <Tabs.Content value="preview">
-                  <RulePreview value={value} />
-                </Tabs.Content>
-              </Box>
-            </Tabs.Root>
+              <PreviewColumn>
+                <RulePreview value={value} />
+              </PreviewColumn>
+            </TwoColumnGrid>
           </InputContainer>
 
           <Field.Hint />

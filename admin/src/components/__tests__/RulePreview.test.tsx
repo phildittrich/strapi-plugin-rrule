@@ -18,10 +18,9 @@ const baseValue: RRuleValue = {
 describe('RulePreview', () => {
   it('renders section labels', () => {
     renderWithIntl(<RulePreview value={baseValue} />);
-    expect(screen.getByText('Description')).toBeInTheDocument();
     expect(screen.getByText('Timezone')).toBeInTheDocument();
     expect(screen.getByText('Next occurrences')).toBeInTheDocument();
-    expect(screen.getByText('RRule string (RFC 5545)')).toBeInTheDocument();
+    expect(screen.getByText('RFC 5545')).toBeInTheDocument();
   });
 
   it('displays the timezone', () => {
@@ -29,9 +28,9 @@ describe('RulePreview', () => {
     expect(screen.getByText('UTC')).toBeInTheDocument();
   });
 
-  it('displays the rrule string with RRULE: prefix', () => {
+  it('displays the rrule string', () => {
     renderWithIntl(<RulePreview value={baseValue} />);
-    expect(screen.getByText(/RRULE:FREQ=WEEKLY/)).toBeInTheDocument();
+    expect(screen.getByText(/FREQ=WEEKLY/)).toBeInTheDocument();
   });
 
   it('shows (empty) when rruleString is empty', () => {
