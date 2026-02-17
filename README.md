@@ -23,7 +23,7 @@
 ## Installation
 
 ```bash
-npm install @opkod-france/strapi-plugin-rrule
+yarn add @opkod-france/strapi-plugin-rrule
 ```
 
 ## Usage
