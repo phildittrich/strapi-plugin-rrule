@@ -7,7 +7,7 @@ export const Box = React.forwardRef<HTMLDivElement, any>(({ children, ...props }
 ));
 
 export const Flex = React.forwardRef<HTMLDivElement, any>(({ children, ...props }, ref) => (
-  <div ref={ref} style={{ display: 'flex' }} {...filterDomProps(props)}>{children}</div>
+  <div ref={ref} data-mock="flex" {...filterDomProps(props)}>{children}</div>
 ));
 
 export const Typography = ({ children, tag: Tag = 'span', ...props }: any) => (
@@ -18,48 +18,63 @@ export const Badge = ({ children, ...props }: any) => (
   <span {...filterDomProps(props)}>{children}</span>
 );
 
-export const SingleSelect = ({ children, value, onChange, disabled, 'aria-label': ariaLabel }: any) => (
-  <select
-    role="combobox"
-    aria-label={ariaLabel}
-    value={value}
-    onChange={(e) => onChange?.(e.target.value)}
-    disabled={disabled}
-  >
-    {children}
-  </select>
-);
+export const SingleSelect = ({ children, value, onChange, disabled, 'aria-label': ariaLabel }: any) => {
+  const fieldCtx = React.useContext(FieldContext);
+  return (
+    <select
+      role="combobox"
+      id={fieldCtx.id}
+      aria-label={ariaLabel}
+      aria-labelledby={fieldCtx.labelId}
+      value={value}
+      onChange={(e) => onChange?.(e.target.value)}
+      disabled={disabled}
+    >
+      {children}
+    </select>
+  );
+};
 
 export const SingleSelectOption = ({ children, value }: any) => (
   <option value={value}>{children}</option>
 );
 
-export const NumberInput = ({ value, onValueChange, disabled, min, max, 'aria-label': ariaLabel }: any) => (
-  <input
-    role="textbox"
-    type="number"
-    aria-label={ariaLabel}
-    value={value ?? ''}
-    onChange={(e) => {
-      const num = Number(e.target.value);
-      if (!isNaN(num)) onValueChange?.(num);
-    }}
-    disabled={disabled}
-    min={min}
-    max={max}
-  />
-);
+export const NumberInput = ({ value, onValueChange, disabled, min, max, 'aria-label': ariaLabel }: any) => {
+  const fieldCtx = React.useContext(FieldContext);
+  return (
+    <input
+      role="textbox"
+      type="number"
+      id={fieldCtx.id}
+      aria-label={ariaLabel}
+      aria-labelledby={fieldCtx.labelId}
+      value={value ?? ''}
+      onChange={(e) => {
+        const num = Number(e.target.value);
+        if (!isNaN(num)) onValueChange?.(num);
+      }}
+      disabled={disabled}
+      min={min}
+      max={max}
+    />
+  );
+};
 
-export const DatePicker = ({ value, onChange, disabled, 'aria-label': ariaLabel }: any) => (
-  <input
-    role="combobox"
-    type="date"
-    aria-label={ariaLabel}
-    value={value instanceof Date ? value.toISOString().split('T')[0] : value ?? ''}
-    onChange={(e) => onChange?.(e.target.value ? new Date(e.target.value) : undefined)}
-    disabled={disabled}
-  />
-);
+export const DatePicker = ({ value, onChange, disabled, 'aria-label': ariaLabel }: any) => {
+  const fieldCtx = React.useContext(FieldContext);
+  return (
+    <input
+      role="combobox"
+      type="date"
+      id={fieldCtx.id}
+      aria-label={ariaLabel}
+      aria-labelledby={fieldCtx.labelId}
+      value={value instanceof Date ? value.toISOString().split('T')[0] : value ?? ''}
+      onChange={(e) => onChange?.(e.target.value ? new Date(e.target.value) : undefined)}
+      disabled={disabled}
+    />
+  );
+};
 
 // Tabs compound component
 const TabsRoot = ({ children, defaultValue }: any) => {
@@ -105,17 +120,44 @@ export const Tabs = {
 };
 
 // Field compound component
-const FieldContext = React.createContext<{ hint?: string; error?: string }>({});
-const FieldRoot = React.forwardRef<HTMLDivElement, any>(({ children, hint, error, ...props }, ref) => (
-  <FieldContext.Provider value={{ hint, error }}>
-    <div ref={ref} {...filterDomProps(props)}>{children}</div>
-  </FieldContext.Provider>
-));
-const FieldLabel = ({ children, action }: any) => <label>{children}{action}</label>;
+type FieldContextValue = {
+  hint?: string;
+  error?: string;
+  id?: string;
+  labelId?: string;
+};
+const FieldContext = React.createContext<FieldContextValue>({});
+
+const FieldRoot = React.forwardRef<HTMLDivElement, any>(
+  ({ children, hint, error, id, name, ...props }, ref) => {
+    const fallbackId = React.useId();
+    const fieldId = id ?? name ?? fallbackId;
+    const labelId = `${fieldId}-label`;
+    return (
+      <FieldContext.Provider value={{ hint, error, id: fieldId, labelId }}>
+        <div ref={ref} {...filterDomProps({ ...props, id: fieldId, name })}>
+          {children}
+        </div>
+      </FieldContext.Provider>
+    );
+  }
+);
+
+const FieldLabel = ({ children, action }: any) => {
+  const { id, labelId } = React.useContext(FieldContext);
+  return (
+    <label id={labelId} htmlFor={id}>
+      {children}
+      {action}
+    </label>
+  );
+};
+
 const FieldHint = () => {
   const { hint } = React.useContext(FieldContext);
   return hint ? <p>{hint}</p> : null;
 };
+
 const FieldError = () => {
   const { error } = React.useContext(FieldContext);
   return error ? <p role="alert">{error}</p> : null;
@@ -127,6 +169,34 @@ export const Field = {
   Hint: FieldHint,
   Error: FieldError,
 };
+
+// Grid compound component
+const GridRoot = ({ children, ...props }: any) => (
+  <div {...filterDomProps(props)}>{children}</div>
+);
+const GridItem = ({ children, ...props }: any) => (
+  <div {...filterDomProps(props)}>{children}</div>
+);
+export const Grid = {
+  Root: GridRoot,
+  Item: GridItem,
+};
+
+// Checkbox (radix-style: controlled by `checked` and `onCheckedChange`)
+export const Checkbox = React.forwardRef<HTMLInputElement, any>(
+  ({ checked, onCheckedChange, disabled, 'aria-label': ariaLabel, ...props }, ref) => (
+    <input
+      ref={ref}
+      role="checkbox"
+      type="checkbox"
+      aria-label={ariaLabel}
+      checked={!!checked}
+      disabled={disabled}
+      onChange={(e) => onCheckedChange?.(e.target.checked)}
+      {...filterDomProps(props)}
+    />
+  )
+);
 
 // Filter out non-DOM props to avoid React warnings
 function filterDomProps(props: Record<string, any>) {

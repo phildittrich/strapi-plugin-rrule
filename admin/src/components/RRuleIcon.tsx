@@ -1,20 +1,17 @@
 import { Flex } from '@strapi/design-system';
 import { Calendar } from '@strapi/icons';
-import { styled } from 'styled-components';
 
-const IconBox = styled(Flex)`
-  background-color: #f0f0ff;
-  border: 1px solid #d9d8ff;
-
-  svg > path {
-    fill: #4945ff;
-  }
-`;
-
-export const RRuleIcon = () => {
-  return (
-    <IconBox justifyContent="center" alignItems="center" width={7} height={6} hasRadius aria-hidden>
-      <Calendar />
-    </IconBox>
-  );
-};
+export const RRuleIcon = () => (
+  <Flex
+    justifyContent="center"
+    alignItems="center"
+    width={7}
+    height={6}
+    hasRadius
+    background="primary100"
+    borderColor="primary200"
+    aria-hidden
+  >
+    <Calendar fill="primary600" />
+  </Flex>
+);

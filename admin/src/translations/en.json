@@ -3,8 +3,7 @@
   "rrule.description": "Define recurring events using the RRule standard (RFC 5545)",
   "rrule.options.advanced.requiredField": "Required field",
   "rrule.options.advanced.requiredField.description": "You won't be able to create an entry if this field is empty",
-  "tab.config": "Configure",
-  "tab.preview": "Preview",
+  "header.title": "Recurrence Rule",
   "frequency.label": "Frequency",
   "frequency.daily": "Daily",
   "frequency.weekly": "Weekly",
@@ -50,5 +49,6 @@
   "preview.timezone": "Timezone",
   "preview.occurrences": "Next occurrences",
   "preview.noOccurrences": "No upcoming occurrences",
-  "preview.rruleString": "RRule string (RFC 5545)"
+  "preview.emptyRrule": "(empty)",
+  "preview.rruleString": "RFC 5545"
 }

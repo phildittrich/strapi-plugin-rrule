@@ -1,28 +1,28 @@
+import * as React from 'react';
+
 import {
-  Box,
+  DatePicker,
+  Field,
   Flex,
+  NumberInput,
   SingleSelect,
   SingleSelectOption,
-  NumberInput,
-  DatePicker,
-  Typography,
 } from '@strapi/design-system';
 import { RRule } from 'rrule';
-import * as React from 'react';
 import { useIntl } from 'react-intl';
 
 import type { RRuleValue } from '../types';
-import { FREQUENCY_OPTIONS, COMMON_TIMEZONES } from '../types';
+import { COMMON_TIMEZONES, FREQUENCY_OPTIONS } from '../types';
+import { getTrad } from '../utils/getTrad';
 import {
+  updateDtstart,
   updateFrequency,
   updateInterval,
   updateTimezone,
-  updateDtstart,
 } from '../utils/rruleActions';
-import { getTrad } from '../utils/getTrad';
-import { WeekdayPicker } from './WeekdayPicker';
-import { MonthlyOptions } from './MonthlyOptions';
 import { EndConditionSection } from './EndConditionSection';
+import { MonthlyOptions } from './MonthlyOptions';
+import { WeekdayPicker } from './WeekdayPicker';
 
 interface RuleConfigSectionProps {
   value: RRuleValue;
@@ -33,8 +33,8 @@ interface RuleConfigSectionProps {
 export const RuleConfigSection = ({ value, onChange, disabled }: RuleConfigSectionProps) => {
   const { formatMessage } = useIntl();
 
-  const handleFreqChange = (freq: string | number) => {
-    onChange(updateFrequency(value, Number(freq)));
+  const handleFreqChange = (next: string | number) => {
+    onChange(updateFrequency(value, Number(next)));
   };
 
   const handleIntervalChange = (interval: number | undefined) => {
@@ -54,15 +54,23 @@ export const RuleConfigSection = ({ value, onChange, disabled }: RuleConfigSecti
   const freqOption = FREQUENCY_OPTIONS.find((o) => o.value === value.freq);
   const intervalUnit = freqOption?.plural ?? 'days';
 
+  const intervalLabel = formatMessage({
+    id: getTrad('interval.label'),
+    defaultMessage: 'Repeat every',
+  });
+  const intervalHint = formatMessage(
+    { id: getTrad('interval.hint'), defaultMessage: 'Every {count} {unit}' },
+    { count: value.interval, unit: intervalUnit }
+  );
+
   return (
     <Flex direction="column" alignItems="stretch" gap={4}>
       {/* Frequency */}
-      <Box>
-        <Typography variant="pi" fontWeight="bold" tag="label">
+      <Field.Root name="frequency" id="rrule-frequency">
+        <Field.Label>
           {formatMessage({ id: getTrad('frequency.label'), defaultMessage: 'Frequency' })}
-        </Typography>
+        </Field.Label>
         <SingleSelect
-          aria-label={formatMessage({ id: getTrad('frequency.label'), defaultMessage: 'Frequency' })}
           value={String(value.freq)}
           onChange={handleFreqChange}
           disabled={disabled}
@@ -76,31 +84,19 @@ export const RuleConfigSection = ({ value, onChange, disabled }: RuleConfigSecti
             </SingleSelectOption>
           ))}
         </SingleSelect>
-      </Box>
+      </Field.Root>
 
       {/* Interval */}
-      <Box>
-        <Typography variant="pi" fontWeight="bold" tag="label">
-          {formatMessage(
-            { id: getTrad('interval.label'), defaultMessage: 'Repeat every' },
-          )}
-        </Typography>
+      <Field.Root name="interval" id="rrule-interval" hint={intervalHint}>
+        <Field.Label>{intervalLabel}</Field.Label>
         <NumberInput
-          aria-label={formatMessage(
-            { id: getTrad('interval.label'), defaultMessage: 'Repeat every' },
-          )}
           value={value.interval}
           onValueChange={handleIntervalChange}
           disabled={disabled}
           min={1}
         />
-        <Typography variant="pi" textColor="neutral600">
-          {formatMessage(
-            { id: getTrad('interval.hint'), defaultMessage: 'Every {count} {unit}' },
-            { count: value.interval, unit: intervalUnit }
-          )}
-        </Typography>
-      </Box>
+        <Field.Hint />
+      </Field.Root>
 
       {/* Weekday picker (WEEKLY only) */}
       {value.freq === RRule.WEEKLY && (
@@ -113,36 +109,30 @@ export const RuleConfigSection = ({ value, onChange, disabled }: RuleConfigSecti
       )}
 
       {/* Start date */}
-      <Box>
-        <Typography variant="pi" fontWeight="bold" tag="label">
+      <Field.Root name="dtstart" id="rrule-dtstart">
+        <Field.Label>
           {formatMessage({ id: getTrad('dtstart.label'), defaultMessage: 'Start date' })}
-        </Typography>
+        </Field.Label>
         <DatePicker
-          aria-label={formatMessage({ id: getTrad('dtstart.label'), defaultMessage: 'Start date' })}
           value={value.dtstart ? new Date(value.dtstart) : undefined}
           onChange={handleDtstartChange}
           disabled={disabled}
         />
-      </Box>
+      </Field.Root>
 
       {/* Timezone */}
-      <Box>
-        <Typography variant="pi" fontWeight="bold" tag="label">
+      <Field.Root name="tzid" id="rrule-tzid">
+        <Field.Label>
           {formatMessage({ id: getTrad('timezone.label'), defaultMessage: 'Timezone' })}
-        </Typography>
-        <SingleSelect
-          aria-label={formatMessage({ id: getTrad('timezone.label'), defaultMessage: 'Timezone' })}
-          value={value.tzid}
-          onChange={handleTimezoneChange}
-          disabled={disabled}
-        >
+        </Field.Label>
+        <SingleSelect value={value.tzid} onChange={handleTimezoneChange} disabled={disabled}>
           {COMMON_TIMEZONES.map((tz) => (
             <SingleSelectOption key={tz} value={tz}>
               {tz}
             </SingleSelectOption>
           ))}
         </SingleSelect>
-      </Box>
+      </Field.Root>
 
       {/* End condition */}
       <EndConditionSection value={value} onChange={onChange} disabled={disabled} />

@@ -7,9 +7,6 @@ const config: Config = {
       'ts-jest',
       {
         tsconfig: 'tsconfig.json',
-        diagnostics: {
-          ignoreDiagnostics: [2322, 2339],
-        },
       },
     ],
   },

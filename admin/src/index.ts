@@ -1,13 +1,16 @@
+import type { ComponentType } from 'react';
+import type { StrapiApp } from '@strapi/strapi/admin';
+
 import { RRuleIcon } from './components/RRuleIcon';
 import { pluginId } from './pluginId';
 import { getTrad } from './utils/getTrad';
 import { prefixPluginTranslations } from './utils/prefixPluginTranslations';
 
 export default {
-  register(app: any) {
+  register(app: StrapiApp) {
     app.customFields.register({
       name: 'rrule',
-      pluginId: 'rrule',
+      pluginId,
       type: 'json',
       icon: RRuleIcon,
       intlLabel: {
@@ -21,7 +24,7 @@ export default {
       components: {
         Input: async () =>
           import('./components/RRuleInput').then((module) => ({
-            default: module.RRuleInput,
+            default: module.RRuleInput as unknown as ComponentType,
           })),
       },
       options: {
@@ -70,6 +73,6 @@ export default {
       })
     );
 
-    return Promise.resolve(importedTrads);
+    return importedTrads;
   },
 };

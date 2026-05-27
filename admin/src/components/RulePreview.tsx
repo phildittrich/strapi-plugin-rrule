@@ -1,7 +1,6 @@
-import { Box, Flex, Typography, Badge } from '@strapi/design-system';
+import { Box, Flex, Typography } from '@strapi/design-system';
 import * as React from 'react';
 import { useIntl } from 'react-intl';
-import { styled } from 'styled-components';
 
 import type { RRuleValue } from '../types';
 import { getTrad } from '../utils/getTrad';
@@ -11,37 +10,6 @@ interface RulePreviewProps {
   value: RRuleValue;
 }
 
-const CodeBlock = styled(Box)`
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-  font-size: 11px;
-  background-color: ${({ theme }) => theme.colors.neutral200};
-  border-radius: ${({ theme }) => theme.borderRadius};
-  padding: ${({ theme }) => theme.spaces[2]};
-  overflow-x: auto;
-  word-break: break-all;
-`;
-
-const OccurrenceItem = styled(Flex)`
-  padding: ${({ theme }) => `${theme.spaces[1]} ${theme.spaces[2]}`};
-  border-radius: ${({ theme }) => theme.borderRadius};
-
-  &:nth-child(odd) {
-    background-color: ${({ theme }) => theme.colors.neutral0};
-  }
-`;
-
-const SummaryBox = styled(Box)`
-  background: ${({ theme }) => theme.colors.primary100};
-  border: 1px solid ${({ theme }) => theme.colors.primary200};
-  border-radius: ${({ theme }) => theme.borderRadius};
-  padding: ${({ theme }) => theme.spaces[3]};
-`;
-
-const SectionLabel = styled(Typography)`
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-`;
-
 export const RulePreview = ({ value }: RulePreviewProps) => {
   const { formatMessage, formatDate } = useIntl();
 
@@ -49,19 +17,24 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
   const occurrences = React.useMemo(() => getNextOccurrences(value, 5), [value]);
 
   return (
-    <Flex direction="column" gap={3}>
+    <Flex direction="column" alignItems="stretch" gap={3}>
       {/* Human-readable summary — prominent */}
-      <SummaryBox>
+      <Box
+        background="primary100"
+        borderColor="primary200"
+        hasRadius
+        padding={3}
+      >
         <Typography variant="omega" fontWeight="semiBold" textColor="primary700">
           {humanReadable}
         </Typography>
-      </SummaryBox>
+      </Box>
 
       {/* Timezone */}
       <Box>
-        <SectionLabel variant="sigma" textColor="neutral600">
+        <Typography variant="sigma" textColor="neutral600">
           {formatMessage({ id: getTrad('preview.timezone'), defaultMessage: 'Timezone' })}
-        </SectionLabel>
+        </Typography>
         <Box paddingTop={1}>
           <Typography variant="pi" textColor="neutral500">
             {value.tzid}
@@ -71,12 +44,12 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
 
       {/* Upcoming occurrences — compact list */}
       <Box>
-        <SectionLabel variant="sigma" textColor="neutral600">
+        <Typography variant="sigma" textColor="neutral600">
           {formatMessage({
             id: getTrad('preview.occurrences'),
             defaultMessage: 'Next occurrences',
           })}
-        </SectionLabel>
+        </Typography>
         <Box paddingTop={1}>
           {occurrences.length === 0 ? (
             <Typography variant="pi" textColor="neutral400">
@@ -86,12 +59,18 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
               })}
             </Typography>
           ) : (
-            <Flex direction="column" gap={1}>
+            <Flex direction="column" alignItems="stretch" gap={1}>
               {occurrences.map((date, index) => (
-                <OccurrenceItem
+                <Flex
                   key={index}
                   justifyContent="space-between"
                   alignItems="center"
+                  paddingTop={1}
+                  paddingBottom={1}
+                  paddingLeft={2}
+                  paddingRight={2}
+                  hasRadius
+                  background={index % 2 === 0 ? 'neutral0' : 'transparent'}
                 >
                   <Typography variant="pi">
                     {formatDate(date, {
@@ -101,8 +80,10 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
                       weekday: 'short',
                     })}
                   </Typography>
-                  <Badge size="S">#{index + 1}</Badge>
-                </OccurrenceItem>
+                  <Typography variant="pi" textColor="neutral500">
+                    #{index + 1}
+                  </Typography>
+                </Flex>
               ))}
             </Flex>
           )}
@@ -111,18 +92,17 @@ export const RulePreview = ({ value }: RulePreviewProps) => {
 
       {/* RRule string — compact */}
       <Box>
-        <SectionLabel variant="sigma" textColor="neutral600">
+        <Typography variant="sigma" textColor="neutral600">
           {formatMessage({
             id: getTrad('preview.rruleString'),
             defaultMessage: 'RFC 5545',
           })}
-        </SectionLabel>
-        <Box paddingTop={1}>
-          <CodeBlock>
-            <Typography variant="pi" textColor="neutral800">
-              {value.rruleString || '(empty)'}
-            </Typography>
-          </CodeBlock>
+        </Typography>
+        <Box paddingTop={1} background="neutral200" hasRadius padding={2}>
+          <Typography tag="code" variant="pi" textColor="neutral800">
+            {value.rruleString ||
+              formatMessage({ id: getTrad('preview.emptyRrule'), defaultMessage: '(empty)' })}
+          </Typography>
         </Box>
       </Box>
     </Flex>

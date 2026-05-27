@@ -1,10 +1,18 @@
-import { Box, Field, SingleSelect, SingleSelectOption, NumberInput, DatePicker, Typography } from '@strapi/design-system';
 import * as React from 'react';
+
+import {
+  DatePicker,
+  Field,
+  Flex,
+  NumberInput,
+  SingleSelect,
+  SingleSelectOption,
+} from '@strapi/design-system';
 import { useIntl } from 'react-intl';
 
-import type { RRuleValue, EndConditionType } from '../types';
-import { updateEndCondition } from '../utils/rruleActions';
+import type { EndConditionType, RRuleValue } from '../types';
 import { getTrad } from '../utils/getTrad';
+import { updateEndCondition } from '../utils/rruleActions';
 
 interface EndConditionSectionProps {
   value: RRuleValue;
@@ -12,7 +20,11 @@ interface EndConditionSectionProps {
   disabled?: boolean;
 }
 
-export const EndConditionSection = ({ value, onChange, disabled }: EndConditionSectionProps) => {
+export const EndConditionSection = ({
+  value,
+  onChange,
+  disabled,
+}: EndConditionSectionProps) => {
   const { formatMessage } = useIntl();
 
   const endType: EndConditionType = value.count
@@ -49,61 +61,59 @@ export const EndConditionSection = ({ value, onChange, disabled }: EndConditionS
   };
 
   return (
-    <Box>
-      <Typography variant="pi" fontWeight="bold" tag="label">
-        {formatMessage({ id: getTrad('end.label'), defaultMessage: 'Ends' })}
-      </Typography>
-      <SingleSelect
-        aria-label={formatMessage({ id: getTrad('end.label'), defaultMessage: 'Ends' })}
-        value={endType}
-        onChange={handleTypeChange}
-        disabled={disabled}
-      >
-        <SingleSelectOption value="never">
-          {formatMessage({ id: getTrad('end.never'), defaultMessage: 'Never' })}
-        </SingleSelectOption>
-        <SingleSelectOption value="count">
-          {formatMessage({ id: getTrad('end.count'), defaultMessage: 'After occurrences' })}
-        </SingleSelectOption>
-        <SingleSelectOption value="until">
-          {formatMessage({ id: getTrad('end.until'), defaultMessage: 'On date' })}
-        </SingleSelectOption>
-      </SingleSelect>
+    <Flex direction="column" alignItems="stretch" gap={2}>
+      <Field.Root name="end-type" id="rrule-end-type">
+        <Field.Label>
+          {formatMessage({ id: getTrad('end.label'), defaultMessage: 'Ends' })}
+        </Field.Label>
+        <SingleSelect value={endType} onChange={handleTypeChange} disabled={disabled}>
+          <SingleSelectOption value="never">
+            {formatMessage({ id: getTrad('end.never'), defaultMessage: 'Never' })}
+          </SingleSelectOption>
+          <SingleSelectOption value="count">
+            {formatMessage({
+              id: getTrad('end.count'),
+              defaultMessage: 'After occurrences',
+            })}
+          </SingleSelectOption>
+          <SingleSelectOption value="until">
+            {formatMessage({ id: getTrad('end.until'), defaultMessage: 'On date' })}
+          </SingleSelectOption>
+        </SingleSelect>
+      </Field.Root>
 
       {endType === 'count' && (
-        <Box paddingTop={2}>
-          <Typography variant="pi" fontWeight="bold" tag="label">
+        <Field.Root name="end-count" id="rrule-end-count">
+          <Field.Label>
             {formatMessage({
               id: getTrad('end.count.value'),
               defaultMessage: 'Number of occurrences',
             })}
-          </Typography>
+          </Field.Label>
           <NumberInput
-            aria-label={formatMessage({
-              id: getTrad('end.count.value'),
-              defaultMessage: 'Number of occurrences',
-            })}
             value={value.count ?? 10}
             onValueChange={handleCountChange}
             disabled={disabled}
             min={1}
           />
-        </Box>
+        </Field.Root>
       )}
 
       {endType === 'until' && (
-        <Box paddingTop={2}>
-          <Typography variant="pi" fontWeight="bold" tag="label">
-            {formatMessage({ id: getTrad('end.until.value'), defaultMessage: 'End date' })}
-          </Typography>
+        <Field.Root name="end-until" id="rrule-end-until">
+          <Field.Label>
+            {formatMessage({
+              id: getTrad('end.until.value'),
+              defaultMessage: 'End date',
+            })}
+          </Field.Label>
           <DatePicker
-            aria-label={formatMessage({ id: getTrad('end.until.value'), defaultMessage: 'End date' })}
             value={value.until ? new Date(value.until) : undefined}
             onChange={handleDateChange}
             disabled={disabled}
           />
-        </Box>
+        </Field.Root>
       )}
-    </Box>
+    </Flex>
   );
 };

@@ -1,13 +1,13 @@
 import * as React from 'react';
 
-import { Field, Flex, Box, Typography } from '@strapi/design-system';
+import { Box, Field, Flex, Grid, Typography } from '@strapi/design-system';
 import { type InputProps, useField } from '@strapi/strapi/admin';
 import { useIntl } from 'react-intl';
-import { styled } from 'styled-components';
 
 import type { RRuleValue } from '../types';
 import { createDefaultRRule } from '../utils/defaults';
 import { getTrad } from '../utils/getTrad';
+import { parseRRuleString } from '../utils/parseRRuleString';
 import { RuleConfigSection } from './RuleConfigSection';
 import { RulePreview } from './RulePreview';
 
@@ -15,63 +15,39 @@ type RRuleInputProps = InputProps & {
   labelAction?: React.ReactNode;
 };
 
-const InputContainer = styled(Box)`
-  border: 1px solid ${({ theme }) => theme.colors.neutral200};
-  border-radius: ${({ theme }) => theme.borderRadius};
-  background: ${({ theme }) => theme.colors.neutral0};
-  overflow: hidden;
-`;
+const isFullRRuleValue = (
+  value: unknown
+): value is RRuleValue =>
+  !!value &&
+  typeof value === 'object' &&
+  'rruleString' in value &&
+  'freq' in value &&
+  typeof (value as { freq: unknown }).freq === 'number';
 
-const TwoColumnGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ConfigColumn = styled(Box)`
-  padding: ${({ theme }) => theme.spaces[4]};
-`;
-
-const PreviewColumn = styled(Box)`
-  padding: ${({ theme }) => theme.spaces[4]};
-  background: ${({ theme }) => theme.colors.neutral100};
-  border-left: 1px solid ${({ theme }) => theme.colors.neutral200};
-
-  @media (max-width: 768px) {
-    border-left: none;
-    border-top: 1px solid ${({ theme }) => theme.colors.neutral200};
-  }
-`;
-
-const SectionHeader = styled(Box)`
-  padding: ${({ theme }) => `${theme.spaces[3]} ${theme.spaces[4]}`};
-  background: ${({ theme }) => theme.colors.neutral100};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.neutral200};
-`;
+const isRRuleStringOnly = (
+  value: unknown
+): value is { rruleString: string } =>
+  !!value &&
+  typeof value === 'object' &&
+  'rruleString' in value &&
+  typeof (value as { rruleString: unknown }).rruleString === 'string' &&
+  !('freq' in value);
 
 export const RRuleInput = React.forwardRef<HTMLDivElement, RRuleInputProps>(
   ({ hint, disabled, labelAction, label, name, required }, forwardedRef) => {
     const { formatMessage } = useIntl();
-    const field = useField<RRuleValue | null>(name);
+    const field = useField<RRuleValue | { rruleString: string } | null>(name);
 
     const value: RRuleValue = React.useMemo(() => {
-      if (field.value && typeof field.value === 'object' && 'rruleString' in field.value) {
+      if (isFullRRuleValue(field.value)) {
         return field.value;
+      }
+      if (isRRuleStringOnly(field.value)) {
+        const parsed = parseRRuleString(field.value.rruleString);
+        if (parsed) return parsed;
       }
       return createDefaultRRule();
     }, [field.value]);
-
-    const hasInitialized = React.useRef(false);
-    React.useEffect(() => {
-      if (!hasInitialized.current && !field.value) {
-        const defaultValue = createDefaultRRule();
-        field.onChange(name, defaultValue);
-        hasInitialized.current = true;
-      }
-    }, [field, name]);
 
     const handleChange = React.useCallback(
       (newValue: RRuleValue) => {
@@ -92,30 +68,51 @@ export const RRuleInput = React.forwardRef<HTMLDivElement, RRuleInputProps>(
         <Flex direction="column" alignItems="stretch" gap={1}>
           <Field.Label action={labelAction}>{label}</Field.Label>
 
-          <InputContainer>
-            <SectionHeader>
+          <Box
+            background="neutral0"
+            borderColor="neutral200"
+            hasRadius
+            overflow="hidden"
+          >
+            <Box
+              background="neutral100"
+              borderColor="neutral200"
+              paddingTop={3}
+              paddingBottom={3}
+              paddingLeft={4}
+              paddingRight={4}
+            >
               <Typography variant="sigma" textColor="neutral600">
                 {formatMessage({
                   id: getTrad('header.title'),
                   defaultMessage: 'Recurrence Rule',
                 })}
               </Typography>
-            </SectionHeader>
+            </Box>
 
-            <TwoColumnGrid>
-              <ConfigColumn>
+            <Grid.Root gridCols={2} gap={0}>
+              <Grid.Item col={2} s={2} m={1} direction="column" alignItems="stretch" padding={4}>
                 <RuleConfigSection
                   value={value}
                   onChange={handleChange}
                   disabled={disabled}
                 />
-              </ConfigColumn>
+              </Grid.Item>
 
-              <PreviewColumn>
+              <Grid.Item
+                col={2}
+                s={2}
+                m={1}
+                direction="column"
+                alignItems="stretch"
+                padding={4}
+                background="neutral100"
+                borderColor="neutral200"
+              >
                 <RulePreview value={value} />
-              </PreviewColumn>
-            </TwoColumnGrid>
-          </InputContainer>
+              </Grid.Item>
+            </Grid.Root>
+          </Box>
 
           <Field.Hint />
           <Field.Error />

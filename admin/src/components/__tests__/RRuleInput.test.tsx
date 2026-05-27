@@ -7,7 +7,7 @@ import { RRuleInput } from '../RRuleInput';
 import { renderWithIntl } from './test-helpers';
 
 const mockOnChange = jest.fn();
-const mockFieldValue: RRuleValue = {
+let mockFieldValue: RRuleValue | { rruleString: string } | null = {
   freq: RRule.WEEKLY,
   interval: 1,
   byweekday: [0],
@@ -26,6 +26,13 @@ jest.mock('@strapi/strapi/admin', () => ({
 describe('RRuleInput', () => {
   beforeEach(() => {
     mockOnChange.mockClear();
+    mockFieldValue = {
+      freq: RRule.WEEKLY,
+      interval: 1,
+      byweekday: [0],
+      tzid: 'UTC',
+      rruleString: 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO',
+    };
   });
 
   it('renders the label', () => {
@@ -46,9 +53,7 @@ describe('RRuleInput', () => {
     renderWithIntl(
       <RRuleInput name="rrule" label="Recurrence" type="json" />
     );
-    // Config side: Frequency label
     expect(screen.getByText('Frequency')).toBeInTheDocument();
-    // Preview side: Next occurrences
     expect(screen.getByText('Next occurrences')).toBeInTheDocument();
   });
 
@@ -57,5 +62,18 @@ describe('RRuleInput', () => {
       <RRuleInput name="rrule" label="Recurrence" type="json" hint="Set up recurrence" />
     );
     expect(screen.getByText('Set up recurrence')).toBeInTheDocument();
+  });
+
+  it('does not call onChange on mount when field value is null', () => {
+    mockFieldValue = null;
+    renderWithIntl(<RRuleInput name="rrule" label="Recurrence" type="json" />);
+    expect(mockOnChange).not.toHaveBeenCalled();
+  });
+
+  it('hydrates structured fields from rruleString when only rruleString is stored', () => {
+    mockFieldValue = { rruleString: 'FREQ=MONTHLY;BYMONTHDAY=15' };
+    renderWithIntl(<RRuleInput name="rrule" label="Recurrence" type="json" />);
+    expect(screen.getByText('Frequency')).toBeInTheDocument();
+    expect(mockOnChange).not.toHaveBeenCalled();
   });
 });

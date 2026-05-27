@@ -40,14 +40,13 @@
     "test:watch": "jest --config jest.config.ts --watchAll"
   },
   "dependencies": {
-    "@strapi/design-system": "^2.0.0",
-    "@strapi/icons": "^2.0.0",
-    "react-intl": "^6.0.0",
     "rrule": "^2.8.1"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@strapi/design-system": "^2.0.0",
+    "@strapi/icons": "^2.0.0",
     "@strapi/sdk-plugin": "^5.0.0",
     "@strapi/strapi": "^5.0.0",
     "@strapi/typescript-utils": "^5.0.0",
@@ -59,6 +58,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-intl": "^6.0.0",
     "react-router-dom": "^6.0.0",
     "semantic-release": "^25.0.3",
     "styled-components": "^6.0.0",
@@ -66,11 +66,17 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
+    "@strapi/design-system": "^2.0.0",
+    "@strapi/icons": "^2.0.0",
     "@strapi/strapi": "^5.0.0",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-intl": "^6.0.0",
     "react-router-dom": "^6.0.0",
     "styled-components": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x"
   },
   "strapi": {
     "name": "rrule",

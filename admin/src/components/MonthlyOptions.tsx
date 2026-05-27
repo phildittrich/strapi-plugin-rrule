@@ -1,11 +1,18 @@
-import { Box, Flex, SingleSelect, SingleSelectOption, NumberInput, Typography } from '@strapi/design-system';
 import * as React from 'react';
+
+import {
+  Field,
+  Flex,
+  NumberInput,
+  SingleSelect,
+  SingleSelectOption,
+} from '@strapi/design-system';
 import { useIntl } from 'react-intl';
 
 import type { RRuleValue } from '../types';
-import { WEEKDAY_OPTIONS, POSITION_OPTIONS } from '../types';
-import { updateMonthDay, updateMonthPosition } from '../utils/rruleActions';
+import { POSITION_OPTIONS, WEEKDAY_OPTIONS } from '../types';
 import { getTrad } from '../utils/getTrad';
+import { updateMonthDay, updateMonthPosition } from '../utils/rruleActions';
 
 interface MonthlyOptionsProps {
   value: RRuleValue;
@@ -46,54 +53,52 @@ export const MonthlyOptions = ({ value, onChange, disabled }: MonthlyOptionsProp
   };
 
   return (
-    <Box>
-      <Typography variant="pi" fontWeight="bold" tag="label">
-        {formatMessage({ id: getTrad('monthly.mode.label'), defaultMessage: 'Repeat by' })}
-      </Typography>
-      <SingleSelect
-        aria-label={formatMessage({ id: getTrad('monthly.mode.label'), defaultMessage: 'Repeat by' })}
-        value={mode}
-        onChange={handleModeChange}
-        disabled={disabled}
-      >
-        <SingleSelectOption value="day">
-          {formatMessage({ id: getTrad('monthly.bymonthday'), defaultMessage: 'Day of month' })}
-        </SingleSelectOption>
-        <SingleSelectOption value="position">
-          {formatMessage({
-            id: getTrad('monthly.bysetpos'),
-            defaultMessage: 'Day of week (e.g., 1st Monday)',
-          })}
-        </SingleSelectOption>
-      </SingleSelect>
+    <Flex direction="column" alignItems="stretch" gap={2}>
+      <Field.Root name="monthly-mode" id="rrule-monthly-mode">
+        <Field.Label>
+          {formatMessage({ id: getTrad('monthly.mode.label'), defaultMessage: 'Repeat by' })}
+        </Field.Label>
+        <SingleSelect value={mode} onChange={handleModeChange} disabled={disabled}>
+          <SingleSelectOption value="day">
+            {formatMessage({
+              id: getTrad('monthly.bymonthday'),
+              defaultMessage: 'Day of month',
+            })}
+          </SingleSelectOption>
+          <SingleSelectOption value="position">
+            {formatMessage({
+              id: getTrad('monthly.bysetpos'),
+              defaultMessage: 'Day of week (e.g., 1st Monday)',
+            })}
+          </SingleSelectOption>
+        </SingleSelect>
+      </Field.Root>
 
       {mode === 'day' && (
-        <Box paddingTop={2}>
-          <Typography variant="pi" fontWeight="bold" tag="label">
+        <Field.Root name="monthly-day" id="rrule-monthly-day">
+          <Field.Label>
             {formatMessage({ id: getTrad('monthly.day.label'), defaultMessage: 'Day' })}
-          </Typography>
+          </Field.Label>
           <NumberInput
-            aria-label={formatMessage({ id: getTrad('monthly.day.label'), defaultMessage: 'Day' })}
             value={dayOfMonth}
             onValueChange={handleDayChange}
             disabled={disabled}
             min={1}
             max={31}
           />
-        </Box>
+        </Field.Root>
       )}
 
       {mode === 'position' && (
-        <Flex gap={2} paddingTop={2}>
-          <Box style={{ flex: 1 }}>
-            <Typography variant="pi" fontWeight="bold" tag="label">
-              {formatMessage({ id: getTrad('monthly.position.label'), defaultMessage: 'Position' })}
-            </Typography>
-            <SingleSelect
-              aria-label={formatMessage({
+        <Flex gap={2} alignItems="end">
+          <Field.Root name="monthly-position" id="rrule-monthly-position" flex="1">
+            <Field.Label>
+              {formatMessage({
                 id: getTrad('monthly.position.label'),
                 defaultMessage: 'Position',
               })}
+            </Field.Label>
+            <SingleSelect
               value={String(position)}
               onChange={handlePositionChange}
               disabled={disabled}
@@ -107,16 +112,16 @@ export const MonthlyOptions = ({ value, onChange, disabled }: MonthlyOptionsProp
                 </SingleSelectOption>
               ))}
             </SingleSelect>
-          </Box>
-          <Box style={{ flex: 1 }}>
-            <Typography variant="pi" fontWeight="bold" tag="label">
-              {formatMessage({ id: getTrad('monthly.weekday.label'), defaultMessage: 'Day of week' })}
-            </Typography>
-            <SingleSelect
-              aria-label={formatMessage({
+          </Field.Root>
+
+          <Field.Root name="monthly-weekday" id="rrule-monthly-weekday" flex="1">
+            <Field.Label>
+              {formatMessage({
                 id: getTrad('monthly.weekday.label'),
                 defaultMessage: 'Day of week',
               })}
+            </Field.Label>
+            <SingleSelect
               value={String(weekday)}
               onChange={handleWeekdayChange}
               disabled={disabled}
@@ -130,9 +135,9 @@ export const MonthlyOptions = ({ value, onChange, disabled }: MonthlyOptionsProp
                 </SingleSelectOption>
               ))}
             </SingleSelect>
-          </Box>
+          </Field.Root>
         </Flex>
       )}
-    </Box>
+    </Flex>
   );
 };
