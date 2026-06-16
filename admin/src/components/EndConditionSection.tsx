@@ -56,7 +56,7 @@ export const EndConditionSection = ({
 
   const handleDateChange = (date: Date | undefined) => {
     if (!date) return;
-    const isoDate = date.toISOString().split('T')[0];
+    const isoDate = date.toLocaleString('sv').split(' ')[0];
     onChange(updateEndCondition(value, 'until', isoDate));
   };
 

@@ -48,7 +48,7 @@ export const RuleConfigSection = ({ value, onChange, disabled }: RuleConfigSecti
   };
 
   const handleDtstartChange = (date: Date | undefined) => {
-    onChange(updateDtstart(value, date ? date.toISOString().split('T')[0] : undefined));
+    onChange(updateDtstart(value, date ? date.toLocaleString('sv').split(' ')[0] : undefined));
   };
 
   const freqOption = FREQUENCY_OPTIONS.find((o) => o.value === value.freq);
