@@ -45,7 +45,7 @@
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@strapi/design-system": "^2.0.0",
+    "@strapi/design-system": "^2.2.0",
     "@strapi/icons": "^2.0.0",
     "@strapi/sdk-plugin": "^5.0.0",
     "@strapi/strapi": "^5.0.0",
