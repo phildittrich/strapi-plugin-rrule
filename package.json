@@ -1,11 +1,11 @@
 {
-  "name": "@opkod-france/strapi-plugin-rrule",
+  "name": "strapi-plugin-rrule",
   "version": "1.0.0",
   "description": "A Strapi custom field plugin for managing recurrence rules (RRule/RFC 5545) for events and schedules",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/opkod-france/strapi-plugin-rrule.git"
+    "url": "https://github.com/phildittrich/strapi-plugin-rrule.git"
   },
   "exports": {
     "./strapi-admin": {
