@@ -1,0 +1,10 @@
+import type { RRuleValue, EndConditionType } from '../types';
+export declare const generateRRuleString: (value: Partial<RRuleValue>) => string;
+export declare const updateFrequency: (value: RRuleValue, freq: number) => RRuleValue;
+export declare const updateInterval: (value: RRuleValue, interval: number) => RRuleValue;
+export declare const toggleWeekday: (value: RRuleValue, weekday: number) => RRuleValue;
+export declare const updateEndCondition: (value: RRuleValue, type: EndConditionType, endValue?: string | number) => RRuleValue;
+export declare const updateTimezone: (value: RRuleValue, tzid: string) => RRuleValue;
+export declare const updateMonthDay: (value: RRuleValue, day: number) => RRuleValue;
+export declare const updateMonthPosition: (value: RRuleValue, position: number, weekday: number) => RRuleValue;
+export declare const updateDtstart: (value: RRuleValue, dtstart: string | undefined) => RRuleValue;
